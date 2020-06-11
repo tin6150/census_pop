@@ -235,15 +235,17 @@ p {
   <p>
   COVID19 care capacity util
   </p>
-  <!-- drop down picker selection UI, value field is keyed to geojson properties field -->
+  <!-- drop down picker selection UI, value field is keyed to map addLayer id (which in turn may match geojson properties field) -->
   <div class='session'> 
       <select id="dataClassSelectorUI">
-          <option value="BedUtil"                         >Hospital Bed Utilization</option> 
-          <option value="positive"               enabled  >Positive cases</option> 
-          <option value="positiveIncrease"       enabled  >Increase in Positive cases</option> 
-          <option value="inIcuCurrently"         enabled  >In ICU currently</option> 
+          <option value="popByCensusBlkGrpLngLat"         >Population Density (Longitude,Latitude)</option> 
+          <option value="popByCensusBlkGrpAlbers" disabled>Population Density (CA Albers projection)</option> 
+          <option value="BedUtil"                disabled >Hospital Bed Utilization</option> 
+          <option value="positive"               disabled >Positive cases</option> 
+          <option value="positiveIncrease"       disabled >Increase in Positive cases</option> 
+          <option value="inIcuCurrently"         disabled >In ICU currently</option> 
           <option value="IcuUtil"                disabled >ICU Utilization</option> 
-          <option value="onVentilatorCurrently"  enabled  >On Ventilator Currently</option> 
+          <option value="onVentilatorCurrently"  disabled >On Ventilator Currently</option> 
           <option value="VentUtil"               disabled >Ventilator Utilization</option> 
       </select>
   </div>
@@ -252,15 +254,15 @@ p {
 		just html element!  well, actually, the css "row colors" is actually doing the color grading.    
 	originally in tutorial this is in the "console" collision UI box.  i just put it here for emphasis :P -->
 	<div class='session'>
-		<h4><div id="LegendTitle">Utilization in %</div></h4>
+		<h4><div id="LegendTitle">Population Estimate 2018</div></h4>
 		<div class='row colors'>
 		</div>
 		<div class='row labels'>
 			<div id="LegendText">
 				<div class='label'>0</div>
-				<div class='label'>25</div>
-				<div class='label'>50</div>
-				<div class='label'>100+</div>
+				<div class='label'>200</div>
+				<div class='label'>1000</div>
+				<div class='label'>4000+</div>
 			</div>
 		</div>
 	</div>
@@ -341,17 +343,8 @@ function cb4mouseMove_featuresDataBoxInfo(e) {
 
         if (states.length > 0) {
             text2display = 
-               "Location: "         + states[0].properties.Location + "<BR>" 
-             + "Hosp Bed Util: "    + Math.round(states[0].properties.BedUtil) + "% <BR>" 
-             + "Current Hospt'zed:" + states[0].properties.hospitalizedCurrently + "<br>" 
-             + "Total Hosp Bed : "  + states[0].properties.TotalHospitalBeds + "<br>" 
-             + "Bed Per 1000 pop: " + states[0].properties.HospitalBedsPer1kPop + "<br>" 
-             + "positive cases: "   + states[0].properties.positive + "<br>" 
-             + "HospitilizedCumulative:"   + states[0].properties.hospitalizedCumulative + "<br>" 
-             + "Hosp Icu cases: "   + states[0].properties.inIcuCurrently + "<BR>" 
-             + "on Ventilator : "   + states[0].properties.onVentilatorCurrently + "<BR>" 
-             + "Data date : "       + states[0].properties.date + "<BR>" 
-             + "Footnotes : "       + states[0].properties.footnotes + "<BR>" 
+               "Density:          " + Math.round(states[0].properties.density) + "<BR>" 
+             + "id (Block Group): " + states[0].properties.id + "<BR>" 
             //console.log( "--dbg-- L324: inside cb4mouseMove_featuresDataBoxInfo(...), text2display is", text2display );
 
             dbgText2display  = JSON.stringify(states);     //tmp dbg use
@@ -364,8 +357,6 @@ function cb4mouseMove_featuresDataBoxInfo(e) {
         //document.getElementById('dbgBox2').innerHTML = dbgText2display;   // dbgBox  is BR overlay box dbg    // why cant use dbgBox ? complain is null...
 };  //end cb4mouseMove_featuresDataBoxInfo()
 
-
-// ++0610++ PopDensity prob change here.
 
 // this callback to handle mousemove should work now
 function cb4mouseMove_dbgBoxInfo(e) {
@@ -396,7 +387,7 @@ function cb4event_dateSlider(e) {
 		//console.log("--trc--L346: inside slider parser cb4event_dateSlider(e).  dateAsNum set to: ", dateAsNum );
 
 		// so mapbox API still used to do the filtering... think of grep for data locally before render/update the map
-		map.setFilter(currentLoadedDataLayer, ['==', ['number',['get','date']], dateAsNum ]);    // approx expected range 20200307 to 20200419 
+		//-map.setFilter(currentLoadedDataLayer, ['==', ['number',['get','date']], dateAsNum ]);    // approx expected range 20200307 to 20200419 
 		//             ^^^1^^^^                                  ^2^^^^^^2^^     ^^3^
 		// ^1^: the first param for setFilter, match the name of 'id' for map.addLayer(...)
 		// ^2^: 'date' is one of the properties in the .geojson
@@ -434,15 +425,15 @@ function cb4event_dataClassSelectorUI(evt) {
 		})
 		console.log("--dbg--L427: cb4event_dataClassSelectorUI(evt) -- addLayer status:", addStatus );
 		document.getElementById('LegendTitle').innerHTML="Utilization in %";
-		document.getElementById('LegendText').innerHTML="<div class='label'>0</div> <div class='label'>25</div> <div class='label'>50</div> <div class='label'>100+</div>";
+		document.getElementById('LegendText').innerHTML="<div class='label'>0</div> <div class='label'>200</div> <div class='label'>1000</div> <div class='label'>4000+</div>";
 	} else {
-		// Utilization in absolute number
+    // population data would only hit this block, never the if-then above
 		addStatus = map.addLayer({
 			id:     reqDataLayer, 
 			type:   'fill',
 			source: 'covid19-cap+case',
-			//paint:  { 'fill-color': styleGradientCount('positive'), 'fill-opacity': 0.3 } ,  //++ TODO 
-			paint:  { 'fill-color': styleGradientCount(reqDataLayer), 'fill-opacity': 0.3 } ,  
+			//-paint:  { 'fill-color': styleGradientCount(reqDataLayer), 'fill-opacity': 0.3 } ,  
+			paint:  { 'fill-color': styleGradientCount("density"), 'fill-opacity': 0.8 } ,  
 			layout: { 'visibility': "visible"}
 		})
 		console.log("--dbg--L428: cb4event_dataClassSelectorUI(evt) -- addLayer status:", addStatus );
@@ -493,21 +484,19 @@ function styleGradientPercent(attribute) {
 function styleGradientCount(attribute) {
     return [
 		'interpolate',
-		['linear'],
+		['linear'], //['exponential'], //['linear'],
 		//['get', 'positive'],    //tmp use, no null here
 		['get', attribute],         // for %utilization attribute are: BedUtil
 		// 9 classes, multi-hue from light yellow to dark red.  need to match legend drawn by html/css
 		// https://colorbrewer2.org/?type=sequential&scheme=YlOrRd&n=9
-		0,    '#ffffff',    // adding white, hopefully null falls in here
-		0.1,  '#ffffcc',
-		10,  '#ffeda0',
-		100,  '#fed976',
-		1000,  '#feb24c',
-		10000,  '#fd8d3c',
-		100000,  '#fc4e2a',
-		1000000,  '#e31a1c',
-		10000000,  '#bd0026',
-		100000000,  '#800026'
+		   1,  '#fff5eb',
+		  10,  '#fee6ce',
+		  50,  '#fdd0a2',
+		 200,  '#fdae6b',
+		 500,  '#fd8d3c',
+		1000,  '#f16913',
+		2000,  '#d94801',
+		4000,  '#8c2d04'
     ]
 }; // end styleGradientCount()
 
@@ -521,7 +510,7 @@ function cb4map_on_load__covidtracking() {
 	// https://stackoverflow.com/questions/51166886/how-to-fill-color-for-a-region-based-on-value-in-mapbox
 	// caair.html
 	//--map.addSource('covid19-cap+case', {  // see ZWEDC_50x50sq_js.html line 461
-	map.addSource('popByCensusBlkGrpLngLat', {
+	map.addSource('popByCensusBlkGrpLngLatSrc', {
 		'type': 'geojson',
 		'data': './data/ca2018bg-density.lngLat.geojson'
 	})
@@ -532,15 +521,16 @@ function cb4map_on_load__covidtracking() {
 	// xref: getInputFormSelection (smelly)
 	console.log("--trc--L510: right before map.addLayer -- expect 1 time add only" )
 	map.addLayer({
-		id:   'PopDensity', //'BedUtil',  //id:   'cap+case',     // id: 'covid19-bedUtil',        //formerly id: 'covidtracking',
+		id:   'popByCensusBlkGrpLngLat', //'BedUtil',  'cap+case',  'covid19-bedUtil',  'covidtracking', // has to match layers in queryRenderedFeatures()
 		type: 'fill', // 'vector'
-		source: 'popByCensusBlkGrpLngLat',
+		source: 'popByCensusBlkGrpLngLatSrc',
 		//source: 'covid19-cap+case',
 		// https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#interpolate
 		paint: {		///* this is the mapbox EXPRESSION api to dynamically change styling (instead of having defined it in mapbox studio as part of the layer)*/
-			'fill-color':   styleGradientPercent('PopDensity'), //[ ],
+			'fill-color':   styleGradientCount('density'), //[ ],
+			//'fill-color':   styleGradientPercent('PopDensity'), //[ ],
 			//'fill-color':   styleGradientPercent('BedUtil'), //[ ],
-			'fill-opacity': 0.3
+			'fill-opacity': 0.8
 		},
 		layout: {}
 

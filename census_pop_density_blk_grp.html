@@ -86,7 +86,7 @@ p {
 /* this specify the size of the top right info box TR */
 #features {
     top: 0;
-    height: 200px;      /* formerly 190px */
+    height: 70px;      /* formerly 190px */
     margin-top: 2px;
     width: 190px;      /* formerly 250px */
 }
@@ -112,7 +112,7 @@ p {
     width:  500px;      /* formerly 250px */
     font-family:"avenir next", Arial, sans-serif;
     font-size: 12px;
-    visibility: visible; /* visible or hidden */
+    visibility: hidden; /* visible or hidden */
 }
 
 
@@ -129,7 +129,7 @@ p {
   font-family: Arial, sans-serif;
   overflow: auto;
   border-radius: 3px;
-  visibility: visible; /* visible or hidden */
+  visibility: hidden; /* visible or hidden */
 }
 
 /* debug box2 BL, cyain-ish, may need it bigger than 600 x 400 */
@@ -142,7 +142,7 @@ p {
     font-family:"avenir next", Arial, sans-serif;
     /* font-size: 10px; */
     font-size: 0.85em;
-    visibility: visible; /* visible or hidden */
+    visibility: hidden; /* visible or hidden */
 }
 
 
@@ -217,7 +217,7 @@ p {
 
 <!-- this create the top right TR info box -->
 <div class='map-overlay' id='features'>
-	<h2>Utilization Detail:</h2> <!-- this is title of top right box -->
+	<h2>Pop per sq mile:</h2> <!-- this is title of top right box -->
 	<div id='pd'><p>Hover to show capacity data.</p></div>   <!-- static text, replaced later by JS -->
 </div>
 
@@ -264,7 +264,8 @@ p {
 				<div class='label'>1000</div>
 				<div class='label'>4000+</div>
 			</div>
-		</div>
+    </div>
+    (Color scale here is linear instead of exponential)
 	</div>
 
 	<!-- date slider control UI - need update for max date range-->
@@ -315,10 +316,11 @@ var map = new mapboxgl.Map({
                    // nope, minZoom here can't overwrite studio data limit.
     //maxZoom:15,  // avoid over zooming in, since this is for state level data
 
-    zoom: 5.5,
+    //zoom: 5.5,  //whole CA
     //center: [-88.4, 42.8], // initial map center in [lon, lat] (whole US) // also see map.on('load'...) set fitBounds
-    center: [	-119.772591, 	36.746841], // initial map center in [lon, lat] of Fresno, CA
 
+    zoom: 10,
+    center: [	-119.772591, 	36.746841], // initial map center in [lon, lat] of Fresno, CA
     //zoom: 12,
     //center: [-74.0059, 40.7128], // initial map center in [lon, lat] (NYC)
     //center: [-122.447303, 37.753574]   SF
@@ -344,7 +346,8 @@ function cb4mouseMove_featuresDataBoxInfo(e) {
         if (states.length > 0) {
             text2display = 
                "Density:          " + Math.round(states[0].properties.density) + "<BR>" 
-             + "id (Block Group): " + states[0].properties.id + "<BR>" 
+             + "Block Group id:   " + states[0].id + "<BR>" 
+            // + "id (Block Group): " + states[0].properties.id + "<BR>" 
             //console.log( "--dbg-- L324: inside cb4mouseMove_featuresDataBoxInfo(...), text2display is", text2display );
 
             dbgText2display  = JSON.stringify(states);     //tmp dbg use
@@ -424,7 +427,7 @@ function cb4event_dataClassSelectorUI(evt) {
 			layout: {}
 		})
 		console.log("--dbg--L427: cb4event_dataClassSelectorUI(evt) -- addLayer status:", addStatus );
-		document.getElementById('LegendTitle').innerHTML="Utilization in %";
+		document.getElementById('LegendTitle').innerHTML="Pop per sq mile";
 		document.getElementById('LegendText').innerHTML="<div class='label'>0</div> <div class='label'>200</div> <div class='label'>1000</div> <div class='label'>4000+</div>";
 	} else {
     // population data would only hit this block, never the if-then above
@@ -501,7 +504,6 @@ function styleGradientCount(attribute) {
 }; // end styleGradientCount()
 
 
-//++ 0610 census ++
 //map.on('load', function() {
 function cb4map_on_load__covidtracking() {
 	console.log("--trc--L240: in cb4map_on_load__covidtracking()" );

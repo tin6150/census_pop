@@ -3,6 +3,8 @@
 <!-- vim: shiftwidth=4 tabstop=4 noexpandtab paste  background=dark
 -->
 <!-- 
+  census_pop_density_blk_grp.html          - lngLat version
+  census_pop_density_blk_grp_CaAlbers.html - Calif Albers projection version.  does it work with mapbox? 
 
     adopted from
     covidtracking_care_capacity_map.dev.html 
@@ -20,7 +22,7 @@
 -->
 <head>
   <meta charset='utf-8' />
-  <title>Calif Population Density by Census Block Group (bld20200610)</title>
+  <title>Calif Population Density by Census Block Group (CaAlbers)</title>
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
   <script src='https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js'></script>
@@ -238,8 +240,8 @@ p {
   <!-- drop down picker selection UI, value field is keyed to map addLayer id (which in turn may match geojson properties field) -->
   <div class='session'> 
       <select id="dataClassSelectorUI">
-          <option value="popByCensusBlkGrpLngLat"         >Population Density (Longitude,Latitude)</option> 
-          <option value="popByCensusBlkGrpAlbers" disabled>Population Density (CA Albers projection)</option> 
+          <option value="popByCensusBlkGrpLngLat"            >Population Density (Longitude,Latitude)</option> 
+          <option value="popByCensusBlkGrpCaAlbers" disabled >Population Density (CA Albers projection)</option> 
           <option value="BedUtil"                disabled >Hospital Bed Utilization</option> 
           <option value="positive"               disabled >Positive cases</option> 
           <option value="positiveIncrease"       disabled >Increase in Positive cases</option> 
@@ -434,7 +436,9 @@ function cb4event_dataClassSelectorUI(evt) {
 		addStatus = map.addLayer({
 			id:     reqDataLayer, 
 			type:   'fill',
-			source: 'covid19-cap+case',
+			source:   currentDataSrc,
+			//source: 'popByCensusBlkGrpCaAlbersSrc',
+			//source: 'covid19-cap+case',
 			//-paint:  { 'fill-color': styleGradientCount(reqDataLayer), 'fill-opacity': 0.3 } ,  
 			paint:  { 'fill-color': styleGradientCount("density"), 'fill-opacity': 0.8 } ,  
 			layout: { 'visibility': "visible"}
@@ -512,10 +516,10 @@ function cb4map_on_load__covidtracking() {
 	// https://stackoverflow.com/questions/51166886/how-to-fill-color-for-a-region-based-on-value-in-mapbox
 	// caair.html
 	//--map.addSource('covid19-cap+case', {  // see ZWEDC_50x50sq_js.html line 461
-	map.addSource('popByCensusBlkGrpLngLatSrc', {
-		'type': 'geojson',
-		'data': './data/ca2018bg-density.lngLat.geojson'
-	})
+	map.addSource('popByCensusBlkGrpLngLatSrc', { 'type': 'geojson', 'data': './data/ca2018bg-density.lngLat.geojson' });
+  currentDataSrc = "popByCensusBlkGrpLngLatSrc";
+	//-map.addSource('popByCensusBlkGrpCaAlbersSrc', { 'type': 'geojson', 'data': './data/ca2018bg-albers-density.geojson' }); // render really strangely , dont use a projection with mapbox!
+  //currentDataSrc = "popByCensusBlkGrpCaAlbersSrc";
 
 
 	// this is seeding the map once on initial load with BedUtil data for the choropleth
@@ -523,9 +527,11 @@ function cb4map_on_load__covidtracking() {
 	// xref: getInputFormSelection (smelly)
 	console.log("--trc--L510: right before map.addLayer -- expect 1 time add only" )
 	map.addLayer({
-		id:   'popByCensusBlkGrpLngLat', //'BedUtil',  'cap+case',  'covid19-bedUtil',  'covidtracking', // has to match layers in queryRenderedFeatures()
+		id:   'popByCensusBlkGrpLngLat', // popByCensusBlkGrpCaAlbers 'BedUtil'  // has to match layers in queryRenderedFeatures()
 		type: 'fill', // 'vector'
-		source: 'popByCensusBlkGrpLngLatSrc',
+		source:   currentDataSrc,
+		//source: 'popByCensusBlkGrpLngLatSrc',
+		//source: 'popByCensusBlkGrpCaAlbersSrc',
 		//source: 'covid19-cap+case',
 		// https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#interpolate
 		paint: {		///* this is the mapbox EXPRESSION api to dynamically change styling (instead of having defined it in mapbox studio as part of the layer)*/
@@ -535,8 +541,8 @@ function cb4map_on_load__covidtracking() {
 			'fill-opacity': 0.8
 		},
 		layout: {}
-
 	});  // end map.addLayer()
+	//currentLoadedDataLayer = "popByCensusBlkGrpCaAlbers";    // keep track of what data layer is being displayed
 	currentLoadedDataLayer = "popByCensusBlkGrpLngLat";    // keep track of what data layer is being displayed
 	//currentLoadedDataLayer = "BedUtil";    // keep track of what data layer is being displayed
 	console.log("--trc--L525: after code for map.addLayer() -- currentLoadedDataLayer is:", currentLoadedDataLayer );

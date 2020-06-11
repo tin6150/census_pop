@@ -2,18 +2,16 @@
 <html>
 <!-- vim: shiftwidth=4 tabstop=4 noexpandtab paste  background=dark
 -->
-<!-- covidtracking_care_capacity_map.html 
-	cuz this version have case data from covidtracking
-	future may use diff source and may need diff field names for the choropleth 
-	This version use data from AlgB, data in state+capacity+cases.geojson
+<!-- 
+
+    adopted from
+    covidtracking_care_capacity_map.dev.html 
 
 	ref: 
 	http://bl.ocks.org/danswick/d813345baf286a5e0766c6b3d9de01c0
 	https://gist.github.com/danswick/d813345baf286a5e0766c6b3d9de01c0
 
-	tin (at) berkeley.edu  2020.04.21
-	- trying new calculcated column BedUtil
-    - need to filter the null data, also filter by desired date.
+	tin (at) berkeley.edu  2020.06.10
 -->
 
 <!-- orig from nyc collision tutorial -->
@@ -22,7 +20,7 @@
 -->
 <head>
   <meta charset='utf-8' />
-  <title>COVID19 Hospital care capacity utilization (bld20200517)</title>
+  <title>Calif Population Density by Census Block Group (bld20200610)</title>
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
   <script src='https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js'></script>
@@ -114,7 +112,7 @@ p {
     width:  500px;      /* formerly 250px */
     font-family:"avenir next", Arial, sans-serif;
     font-size: 12px;
-    visibility: hidden; /* visible or hidden */
+    visibility: visible; /* visible or hidden */
 }
 
 
@@ -144,7 +142,7 @@ p {
     font-family:"avenir next", Arial, sans-serif;
     /* font-size: 10px; */
     font-size: 0.85em;
-    visibility: hidden; /* visible or hidden */
+    visibility: visible; /* visible or hidden */
 }
 
 
@@ -160,7 +158,6 @@ p {
 }
 
 /** legend is from the nyc collision example, mostly fitted INSIDE TL "console"  **/
-
 #legend {
   padding: 10px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
@@ -316,8 +313,9 @@ var map = new mapboxgl.Map({
                    // nope, minZoom here can't overwrite studio data limit.
     //maxZoom:15,  // avoid over zooming in, since this is for state level data
 
-    zoom: 3.7,
-    center: [-88.4, 42.8], // initial map center in [lon, lat] (whole US) // also see map.on('load'...) set fitBounds
+    zoom: 5.5,
+    //center: [-88.4, 42.8], // initial map center in [lon, lat] (whole US) // also see map.on('load'...) set fitBounds
+    center: [	-119.772591, 	36.746841], // initial map center in [lon, lat] of Fresno, CA
 
     //zoom: 12,
     //center: [-74.0059, 40.7128], // initial map center in [lon, lat] (NYC)
@@ -339,7 +337,7 @@ function cb4mouseMove_featuresDataBoxInfo(e) {
         text2display = "";
         dbgText2display = "no data yet";
         dbgText2display = JSON.stringify(states);  //tmp dbg use
-        dbg2Text2display = "no data yet";
+        dbg2Text2display = "no data yet [dbg2]";
 
         if (states.length > 0) {
             text2display = 
@@ -366,6 +364,8 @@ function cb4mouseMove_featuresDataBoxInfo(e) {
         //document.getElementById('dbgBox2').innerHTML = dbgText2display;   // dbgBox  is BR overlay box dbg    // why cant use dbgBox ? complain is null...
 };  //end cb4mouseMove_featuresDataBoxInfo()
 
+
+// ++0610++ PopDensity prob change here.
 
 // this callback to handle mousemove should work now
 function cb4mouseMove_dbgBoxInfo(e) {
@@ -512,17 +512,18 @@ function styleGradientCount(attribute) {
 }; // end styleGradientCount()
 
 
+//++ 0610 census ++
 //map.on('load', function() {
 function cb4map_on_load__covidtracking() {
 	console.log("--trc--L240: in cb4map_on_load__covidtracking()" );
-	map.fitBounds([[-133.2421875, 16.972741], [-47.63671875, 52.696361]]);  // continental US and some, but no Hawaii or Alaska
+	//-map.fitBounds([[-133.2421875, 16.972741], [-47.63671875, 52.696361]]);  // continental US and some, but no Hawaii or Alaska
 	map.getCanvas().style.cursor = 'default';
 	// https://stackoverflow.com/questions/51166886/how-to-fill-color-for-a-region-based-on-value-in-mapbox
 	// caair.html
-	//--map.addSource('population', {
-	map.addSource('covid19-cap+case', {  // see ZWEDC_50x50sq_js.html line 461
+	//--map.addSource('covid19-cap+case', {  // see ZWEDC_50x50sq_js.html line 461
+	map.addSource('popByCensusBlkGrpLngLat', {
 		'type': 'geojson',
-		'data': './state+capacity+cases.geojson'
+		'data': './data/ca2018bg-density.lngLat.geojson'
 	})
 
 
@@ -531,32 +532,36 @@ function cb4map_on_load__covidtracking() {
 	// xref: getInputFormSelection (smelly)
 	console.log("--trc--L510: right before map.addLayer -- expect 1 time add only" )
 	map.addLayer({
-		id:   'BedUtil',  //id:   'cap+case',     // id: 'covid19-bedUtil',        //formerly id: 'covidtracking',
+		id:   'PopDensity', //'BedUtil',  //id:   'cap+case',     // id: 'covid19-bedUtil',        //formerly id: 'covidtracking',
 		type: 'fill', // 'vector'
-		source: 'covid19-cap+case',
+		source: 'popByCensusBlkGrpLngLat',
+		//source: 'covid19-cap+case',
 		// https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#interpolate
 		paint: {		///* this is the mapbox EXPRESSION api to dynamically change styling (instead of having defined it in mapbox studio as part of the layer)*/
-			'fill-color':   styleGradientPercent('BedUtil'), //[ ],
+			'fill-color':   styleGradientPercent('PopDensity'), //[ ],
+			//'fill-color':   styleGradientPercent('BedUtil'), //[ ],
 			'fill-opacity': 0.3
 		},
 		layout: {}
 
 	});  // end map.addLayer()
-	currentLoadedDataLayer = "BedUtil";    // keep track of what data layer is being displayed
+	currentLoadedDataLayer = "popByCensusBlkGrpLngLat";    // keep track of what data layer is being displayed
+	//currentLoadedDataLayer = "BedUtil";    // keep track of what data layer is being displayed
 	console.log("--trc--L525: after code for map.addLayer() -- currentLoadedDataLayer is:", currentLoadedDataLayer );
 
 	
 	// need to start with an inital filter date for the data
 	//            "filter":   ['==', ['type',  ['get', 'key']],'value']
 	//map.setFilter('cap+case', ['==', ['number',['get','date']], 20200419 ]);    // range 20200307 to 20200419 
-	map.setFilter(currentLoadedDataLayer, ['==', ['number',['get','date']], showDataDate ]);    // approx range 20200307 to 20200419 
-	document.getElementById('slider').addEventListener('input', cb4event_dateSlider );
+	//--map.setFilter(currentLoadedDataLayer, ['==', ['number',['get','date']], showDataDate ]);    // approx range 20200307 to 20200419 
+	//--map.setFilter(currentLoadedDataLayer, ['==', ['number',['get','density']], showDataDate ]);    // approx range 20200307 to 20200419 
+	//--document.getElementById('slider').addEventListener('input', cb4event_dateSlider );
 
-	document.getElementById('dataClassSelectorUI').addEventListener('change', cb4event_dataClassSelectorUI );
+	//--document.getElementById('dataClassSelectorUI').addEventListener('change', cb4event_dataClassSelectorUI );
 
 	console.log("--trc--L456: right before map.on('mousemove', cb...) " );
 	map.on('mousemove', cb4mouseMove_dbgBoxInfo);			//BL, BR overlay
-	map.on('mousemove', cb4mouseMove_featuresDataBoxInfo);  //TL overlay
+	map.on('mousemove', cb4mouseMove_featuresDataBoxInfo);  // TR (not TL) overlay
 
 	console.log("--trc--L459: at the end of cb4map_on_load__covidtracking()" ); 
 };  //end cb4map_on_load__covidtracking()

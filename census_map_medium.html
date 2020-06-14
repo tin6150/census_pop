@@ -84,61 +84,8 @@ p {
 }
 
 
-/* yellowish box bottom right BR */
-.map-overlay-dbg {
-  position: absolute;
-  bottom: 0;  
-  right: 0;
-  background: rgba(250, 250, 224, 0.8);  /* this is greenish/yellowish */ 
-  margin-right: 4px; /* choropleth used 20px */
-  margin-bottom: 16px; /* leave some space for copyright/attribution */
-  font-family: Arial, sans-serif;
-  overflow: auto;
-  border-radius: 3px;
-}
-/* debug box, BR, yellow-ish, may need it bigger than 600 x 400 */
-#featuresDbg {
-    /*top: 110; */
-    margin-top: 20px;
-    height: 360px;      /* formerly 100px */
-    width:  500px;      /* formerly 250px */
-    font-family:"avenir next", Arial, sans-serif;
-    font-size: 12px;
-    visibility: hidden; /* visible or hidden */
-}
 
-
-
-
-/* cyan-ish box bottom left BL */
-.map-overlay-dbg2 {
-  position: absolute;
-  bottom: 0;  
-  left: 0;
-  background: rgba(106, 221, 236, 0.8);  /* this is cyain-ish */ 
-  margin-left: 4px; /* choropleth used 20px */
-  margin-bottom: 16px; /* 28px needed for mapbox logo */
-  font-family: Arial, sans-serif;
-  overflow: auto;
-  border-radius: 3px;
-  visibility: hidden; /* visible or hidden */
-}
-
-/* debug box2 BL, cyain-ish, may need it bigger than 600 x 400 */
-#featuresDbg2 {
-    /* top: 110; */
-    /*margin-top: 20px; */
-    /*margin-left: 300px;*/
-    height: 100px;   
-    width:  600px;    
-    font-family:"avenir next", Arial, sans-serif;
-    /* font-size: 10px; */
-    font-size: 0.85em;
-    visibility: hidden; /* visible or hidden */
-}
-
-
-/** "console" : nyc collision example, where User Control is presented - Top Left TL **/
+/** "console" - Top Left TL **/
 #console {
   position: absolute;
   width: 200px;
@@ -150,7 +97,7 @@ p {
   z-index: 10;  /* map should be at z-index 0.  want this behind the legend at tr */
 }
 
-/** legend is from the nyc collision example, mostly fitted INSIDE TL "console"  **/
+/** legend, mostly fitted INSIDE TL "console"  **/
 #legend {
   padding: 10px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
@@ -183,14 +130,7 @@ p {
   width: 96%;
 }
 
-.row4slider {
-  height: 0.6em; /*10px;*/
-  width: 96%;
-  position: relative;
-  margin-left: 0 auto;
-  text-align: center;
-  float: center; 
-}
+
 /** the label css is for the text legend below the colorbar to be horizontal (def to vertical) **/
 .label {
   width:      23%;   /*nyc collision had 6 entries for 'lable' which came out to 6*15=90%*/
@@ -214,32 +154,17 @@ p {
 	<div id='pd'><p>Hover to show capacity data.</p></div>   <!-- static text, replaced later by JS -->
 </div>
 
-<!-- funny positioning by mapbox gl js?  it goes in the bottom right without obvious place where this is specified -->
-<div class='map-overlay-dbg' id='featuresDbg'><!-- BR yellowish box -->
-	<div id='dbgBox'><p>(data via mapbox tileset)</p></div>   <!-- static text, replaced later by JS -->
-</div>
-<div class='map-overlay-dbg2' id='featuresDbg2'><!-- BL cyanish box-->
-	<div id='dbgBox2'><p>(dbg for queried data via)</p></div>   <!-- static text, replaced later by JS -->
-</div>
 
-
-<!-- nyc collision eg, top left user input "console" -->
+<!-- top left user input "console" -->
 <div id='console'>
   <p>
-  COVID19 care capacity util
+  Census.gov data
   </p>
   <!-- drop down picker selection UI, value field is keyed to map addLayer id (which in turn may match geojson properties field) -->
   <div class='session'> 
       <select id="dataClassSelectorUI">
-          <option value="popByCensusBlkGrpLngLat"            >Population Density (Longitude,Latitude)</option> 
-          <option value="popByCensusBlkGrpCaAlbers" disabled >Population Density (CA Albers projection)</option> 
-          <option value="BedUtil"                disabled >Hospital Bed Utilization</option> 
-          <option value="positive"               disabled >Positive cases</option> 
-          <option value="positiveIncrease"       disabled >Increase in Positive cases</option> 
-          <option value="inIcuCurrently"         disabled >In ICU currently</option> 
-          <option value="IcuUtil"                disabled >ICU Utilization</option> 
-          <option value="onVentilatorCurrently"  disabled >On Ventilator Currently</option> 
-          <option value="VentUtil"               disabled >Ventilator Utilization</option> 
+          <option value="popByCensusBlkGrpLngLat"            >Pop Density (Lng,Lat)</option> 
+          <option value="popByCensusBlkGrpCaAlbers" disabled >Pop Density (Albers)</option> 
       </select>
   </div>
 
@@ -258,37 +183,15 @@ p {
 				<div class='label'>4000+</div>
 			</div>
     </div>
-    (Color scale here is linear instead of exponential)
 	</div>
-
-	<!-- date slider control UI - need update for max date range-->
-	<div class='session' id='sliderbar'>
-		<h2>Date: <label id='active-date'>5/1</label></h2>  <!-- TODO: update when got new data -->
-		<!--  ++TODO: update active-date id (above) and showDataDate (further down) when got new data -->
-
-		<!-- new JS date object based, internal is millisec since unix epoch 1970-01-01 (GMT)
-1583568000000 from JS console.log(Date.parse('2020-03-07 PST' ) );
-1588579200000 from JS console.log(Date.parse('2020-05-04 PST') );
-1588320000000 from JS Date.parse('2020-05-01 PST') 
-1588406400000 2020-05-02 PST
-		-->
-		<input id='slider' class='row4slider' type="range" step="86400000" min="1583568000000" max="1588579200000" value="1588320000000" />  
-	</div>
-	
-
 </div> <!-- end div console -->
 
 	
 
 <script>
 
-var showDataDate = 20200501;  // number, not string, // ++TODO: update when got new data, also active-date id HTML higher up
-//document.querySelector('#slider').max = 1588406400000 ;   // 2020-05-02 PST
-document.querySelector('#slider').max = new Date() - (86400000*2);  // set max to today - N day, would need automated daily data upload.
-// HTML DOM #name is for id=name ??  .name is for class=name ?? 
 
 // define access token
-//mapboxgl.accessToken = 'pk.eyJ1IjoiZXhhbXBsZXMiLCJhIjoiY2lqbmpqazdlMDBsdnRva284cWd3bm11byJ9.V6Hg2oYJwMAxeoR9GEzkAA'; // census choropleth tutorial
 mapboxgl.accessToken = 'pk.eyJ1IjoidGluMTE3IiwiYSI6ImNrNWxnd21ydjBvc2UzZG8wanQzaGwzcGIifQ.3_B2PYgav56oacPlVu5u9w';  // tin117 for nyc/covid19
 // above was presented by Studio Beta 2020.0412, for covid19-Monochrome (under tin117)
 
@@ -305,23 +208,20 @@ var map = new mapboxgl.Map({
     attributionControl: false,                  // if setting to false remove the fine print at bottom.  I still have an info circle that pop up, should be good enough
     //hash: true,     // change URL with a hash of map zoom/lat/long    eg append: #15/37.434/-121.945   # notice it is lat/long in this url!!  so it is zoom/y/x
 
-    //minZoom: 2,  // studio have census track data avail in zoom 10 to 22, trying to see if can have data show up with much less detail (ie lower zoom num)
-                   // nope, minZoom here can't overwrite studio data limit.
-    //maxZoom:15,  // avoid over zooming in, since this is for state level data
-
     //zoom: 5.5,  //whole CA
     //center: [-88.4, 42.8], // initial map center in [lon, lat] (whole US) // also see map.on('load'...) set fitBounds
 
-    zoom: 10,
-    center: [	-119.772591, 	36.746841], // initial map center in [lon, lat] of Fresno, CA
+    //zoom: 10,
+    //center: [	-119.772591, 	36.746841], // initial map center in [lon, lat] of Fresno, CA
     //zoom: 12,
     //center: [-74.0059, 40.7128], // initial map center in [lon, lat] (NYC)
-    //center: [-122.447303, 37.753574]   SF
+    zoom: 8,  // for mapbox link use
+    center: [-122.447303, 37.753574]   //SF
     //center: [-121.945, 37.434],  // alviso ZWEDC
 });
 
 
-// this update the TL overlay data box named feature in the html div
+// this update the TR overlay data box named feature in the html div
 function cb4mouseMove_featuresDataBoxInfo(e) {
         //console.log( "--trc-- L319: inside cb4mouseMove_featuresDataBoxInfo(...)" );
         var states = map.queryRenderedFeatures(e.point, {
@@ -367,33 +267,6 @@ function cb4mouseMove_dbgBoxInfo(e) {
         document.getElementById('featuresDbg').innerHTML = JSON.stringify(features, null, 2);
 };  // end cb4mouseMove_dbgBoxInfo()
 
-
-// xref: see ZWEDC_50x50sq_js line 218 for map.on('zoom') to change legend scale
-
-// this callback fn handle the date slider event
-function cb4event_dateSlider(e) {
-		var dateInMsec = parseInt(e.target.value); // input msec since unix epoch eg 1588320000000 for 2020-05-01 
-		//console.log("--trc--L344: inside slider parser cb4event_dateSlider(e).  dateInMsec read as: ", dateInMsec );
-		var jsDate = new Date( dateInMsec ); 
-		var dateMM = (jsDate.getMonth() + 1).toString().padStart(2,'0'); // getMonth() Jan is 0
-		var dateDD = jsDate.getDate().toString().padStart(2,'0');        // 01
-		var dateYYYY = jsDate.toLocaleString("en-US", {year: "numeric"}) // 2020
-		var dateYYYYMMDD = dateYYYY + dateMM + dateDD ; // "20200501"
-		var dateAsNum = parseInt(dateYYYYMMDD);
-		//console.log("--trc--L346: inside slider parser cb4event_dateSlider(e).  dateAsNum set to: ", dateAsNum );
-
-		// so mapbox API still used to do the filtering... think of grep for data locally before render/update the map
-		//-map.setFilter(currentLoadedDataLayer, ['==', ['number',['get','date']], dateAsNum ]);    // approx expected range 20200307 to 20200419 
-		//             ^^^1^^^^                                  ^2^^^^^^2^^     ^^3^
-		// ^1^: the first param for setFilter, match the name of 'id' for map.addLayer(...)
-		// ^2^: 'date' is one of the properties in the .geojson
-		// ^3^: 'dateAsNum' is read as var from parseInt(e...) 
-		
-		// update text in the UI
-		document.getElementById('active-date').innerText = dateMM + "/" + dateDD;
-		cb4mouseMove_featuresDataBoxInfo(e) ; // call to update TL feature display overlay box
-
-}; // end cb4event_dateSlider(e)
 
 	
 
@@ -450,8 +323,6 @@ function styleGradientPercent(attribute) {
     return [
                 'interpolate',
                 ['linear'],
-                //['get', 'positive'],    //tmp use, no null here
-                //['get', 'BedUtil'],       // change field here
                 ['get', attribute],         // for %utilization attribute are: BedUtil
                 // 9 classes, multi-hue from light yellow to dark red.  need to match legend drawn by html/css
                 // https://colorbrewer2.org/?type=sequential&scheme=YlOrRd&n=9
@@ -465,13 +336,6 @@ function styleGradientPercent(attribute) {
                 70,  '#e31a1c',
                 90,  '#bd0026',
                 100,  '#800026'
-		    //'fill-color': [ "curve", ["step"], ["number", ["get", "density"], 1], "#FFEDA0", 10, "#FED976", 20, "#FEB24C", 50, "#FD8D3C", 100, "#FC4E2A", 200, "#E31A1C", 500, "#BD0026", 2000, "#000000" ],
-		    // use a curve (http://bl.ocks.org/anandthakker/raw/6d0269825a7e0381cdcde13f84a0b6b0/#types-expression-curve)
-		    // of type "step," which will step through each break instead of interpolating between them.
-		    // Then, get the density value and use a `number` expression to return it as a number instead of a string.
-		    // Each step is then a pair [{color code}, {max value for break}]
-		    // Finally, add a default color code for any features that fall outside of the steps you've defined.
-		    //-"curve", ["step"], ["number", ["get", "density"], 1], "#FFEDA0", 10, "#FED976", 20, "#FEB24C", 50, "#FD8D3C", 100, "#FC4E2A", 200, "#E31A1C", 500, "#BD0026", 2000, "#000000"
     ]
 }; // end styleGradientPercent()
 
@@ -523,34 +387,19 @@ function cb4map_on_load__covidtracking() {
 		source:   currentDataSrc,
 		//source: 'popByCensusBlkGrpLngLatSrc',
 		//source: 'popByCensusBlkGrpCaAlbersSrc',
-		//source: 'covid19-cap+case',
 		// https://docs.mapbox.com/mapbox-gl-js/style-spec/expressions/#interpolate
 		paint: {		///* this is the mapbox EXPRESSION api to dynamically change styling (instead of having defined it in mapbox studio as part of the layer)*/
 			'fill-color':   styleGradientCount('density'), //[ ],
 			//'fill-color':   styleGradientPercent('PopDensity'), //[ ],
-			//'fill-color':   styleGradientPercent('BedUtil'), //[ ],
 			'fill-opacity': 0.8
 		},
 		layout: {}
 	});  // end map.addLayer()
 	//currentLoadedDataLayer = "popByCensusBlkGrpCaAlbers";    // keep track of what data layer is being displayed
 	currentLoadedDataLayer = "popByCensusBlkGrpLngLat";    // keep track of what data layer is being displayed
-	//currentLoadedDataLayer = "BedUtil";    // keep track of what data layer is being displayed
 	console.log("--trc--L525: after code for map.addLayer() -- currentLoadedDataLayer is:", currentLoadedDataLayer );
-
-	
-	// need to start with an inital filter date for the data
-	//            "filter":   ['==', ['type',  ['get', 'key']],'value']
-	//map.setFilter('cap+case', ['==', ['number',['get','date']], 20200419 ]);    // range 20200307 to 20200419 
-	//--map.setFilter(currentLoadedDataLayer, ['==', ['number',['get','date']], showDataDate ]);    // approx range 20200307 to 20200419 
-	//--map.setFilter(currentLoadedDataLayer, ['==', ['number',['get','density']], showDataDate ]);    // approx range 20200307 to 20200419 
-	//--document.getElementById('slider').addEventListener('input', cb4event_dateSlider );
-
-	//--document.getElementById('dataClassSelectorUI').addEventListener('change', cb4event_dataClassSelectorUI );
-
-	console.log("--trc--L456: right before map.on('mousemove', cb...) " );
-	map.on('mousemove', cb4mouseMove_dbgBoxInfo);			//BL, BR overlay
-	map.on('mousemove', cb4mouseMove_featuresDataBoxInfo);  // TR (not TL) overlay
+  
+  map.on('mousemove', cb4mouseMove_featuresDataBoxInfo);  // TR (not TL) overlay
 
 	console.log("--trc--L459: at the end of cb4map_on_load__covidtracking()" ); 
 };  //end cb4map_on_load__covidtracking()
@@ -570,24 +419,6 @@ map.addControl(new mapboxgl.AttributionControl({
         customAttribution: '<A HREF="https://github.com/tin6150/census_pop">(cc) Tin Ho. App Info</A>'
 }));
 
-// wanted to invoke this once to do initial draw of date slider and set proper start date, but dont work
-cb4event_dateSlider;      // at least this doesnt error out, but dont seems executed
-
-
-// trying a draw to see if it help with refresh
-// https://gis.stackexchange.com/questions/344406/dynamical-refresh-of-mapbox-layers-after-drawing-edits
-map.on('draw.update', function(){
-  console.log('--trc--L585: map.on(draw.update)');
-  cb4event_dateSlider 
-});
-// does not ever seems to be called :/
-
-//map.on('moveend') broke map
-//styledata, could not get triggered
-//map.once('styledata', function(){
-  //console.log('--trc--L591: map.once(styledata)');
-  //cb4event_dateSlider  
-//});
 
 
 console.log("--dbg--L999: the-end of script section, no more code, but likely exec early cuz of async nature and all the call backs!)" );

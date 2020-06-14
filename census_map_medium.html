@@ -3,23 +3,16 @@
 <!-- vim: shiftwidth=4 tabstop=4 noexpandtab paste  background=dark
 -->
 <!-- 
-  census_pop_density_blk_grp.html          - lngLat version
-  census_pop_density_blk_grp_CaAlbers.html - Calif Albers projection version.  does it work with mapbox? 
-
-    adopted from
-    covidtracking_care_capacity_map.dev.html 
+  census_pop_density_blk_grp.html - lngLat version
+  census_map_medium.html          - slightly changed from above for link to use in medium post at https://medium.com/@tin_ho/command-line-cartography-census-blockgroup-level-data-5aa222de8ab0
+  (also slightly cleaned)
 
 	ref: 
-	http://bl.ocks.org/danswick/d813345baf286a5e0766c6b3d9de01c0
 	https://gist.github.com/danswick/d813345baf286a5e0766c6b3d9de01c0
 
-	tin (at) berkeley.edu  2020.06.10
+	tin (at) berkeley.edu  2020.06.14
 -->
 
-<!-- orig from nyc collision tutorial -->
-<!-- mapbox tutorial multi-date data in .geojson: https://docs.mapbox.com/help/tutorials/show-changes-over-time/ , 
-  with local test as: https://tin6150.github.io/covid19_care_capacity_map/eg_nyc_collision_map.html 
--->
 <head>
   <meta charset='utf-8' />
   <title>Calif Population Density by Census Block Group (LngLat)</title>
@@ -29,10 +22,6 @@
   <link href='https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css' rel='stylesheet' />
 
   <style type="text/css">
-
-/* // # is not comment in css, probably cuz how html/url need to use # ...  */
-/* and the snafu was cuz i had the above comment using // and presumably caused a parse error and ignored the block below.  *sigh* */
-/* css validador would likely have been able to point that out and saved me hours of time!! */
 
 body {
     margin: 0;

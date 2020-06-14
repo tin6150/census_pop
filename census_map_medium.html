@@ -185,11 +185,9 @@ p {
     </div>
 	</div>
 </div> <!-- end div console -->
-
 	
 
 <script>
-
 
 // define access token
 mapboxgl.accessToken = 'pk.eyJ1IjoidGluMTE3IiwiYSI6ImNrNWxnd21ydjBvc2UzZG8wanQzaGwzcGIifQ.3_B2PYgav56oacPlVu5u9w';  // tin117 for nyc/covid19
@@ -206,18 +204,15 @@ var map = new mapboxgl.Map({
     style: 'mapbox://styles/tin117/ck8xway380ojo1isg3z408rc9',   // covid19-monochrome  2020-0412
 
     attributionControl: false,                  // if setting to false remove the fine print at bottom.  I still have an info circle that pop up, should be good enough
-    //hash: true,     // change URL with a hash of map zoom/lat/long    eg append: #15/37.434/-121.945   # notice it is lat/long in this url!!  so it is zoom/y/x
+    hash: true,     // change URL with a hash of map zoom/lat/long    eg append: #15/37.434/-121.945   # notice it is lat/long in this url!!  so it is zoom/y/x
 
     //zoom: 5.5,  //whole CA
     //center: [-88.4, 42.8], // initial map center in [lon, lat] (whole US) // also see map.on('load'...) set fitBounds
 
     //zoom: 10,
     //center: [	-119.772591, 	36.746841], // initial map center in [lon, lat] of Fresno, CA
-    //zoom: 12,
-    //center: [-74.0059, 40.7128], // initial map center in [lon, lat] (NYC)
-    zoom: 8,  // for mapbox link use
+    zoom: 8,  // for medium link use
     center: [-122.447303, 37.753574]   //SF
-    //center: [-121.945, 37.434],  // alviso ZWEDC
 });
 
 
@@ -418,6 +413,24 @@ map.addControl(new mapboxgl.AttributionControl({
         compact: false,  // set to false to add an EXTRA line with info below prefixed.  true add an (i) icon
         customAttribution: '<A HREF="https://github.com/tin6150/census_pop">(cc) Tin Ho. App Info</A>'
 }));
+
+
+
+
+// https://www.mapbox.com/mapbox-gl-js/api/#navigationcontrol
+map.addControl( new mapboxgl.FullscreenControl({container: document.querySelector('body')}), 'bottom-right' );
+map.addControl( new mapboxgl.NavigationControl(), 'bottom-right');  
+
+var scale = new mapboxgl.ScaleControl({
+    //maxWidth: 80,
+    unit: 'metric'
+});
+map.addControl(scale);
+//scale.setUnit('imperial');
+
+// https://www.mapbox.com/mapbox-gl-js/api/#keyboardhandler#enable  but don't seems to do anything in chrome :(
+map.keyboard.enable();
+
 
 console.log("--dbg--L999: the-end of script section, no more code, but likely exec early cuz of async nature and all the call backs!)" );
 

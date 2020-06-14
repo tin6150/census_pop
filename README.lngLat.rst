@@ -36,10 +36,13 @@ shp2json cb_2018_06_bg_500k.shp -o ca2018bg.json
 ln ../TMP_DATA_BLOCK/ca2018bg.json .
 
 
+# **eg 1b**
 XX omiting ca albers projection
 XX geoproject 'd3.geoConicEqualArea().parallels([34, 40.5]).rotate([120, 0]).fitSize([960, 960], d)' < ca2018bg.json > ca2018bg-albers.json
 # map project, changed coordinates to like [164.1468809671912,437.62295438355295]
 # anyway, lost lng/lat by here, not good for modeling work downstream.
+
+# **eg 1c**
 
 XX geo2svg -w 960 -h 960 < ca2018bg-albers.json > ca2018bg-albers.svg
 # that svg file is huge, 11M, xviewer could not handle it.  (but prev handled 6.7M file)
@@ -178,7 +181,25 @@ no diff shown, so they are the same.
 XX geoproject 'd3.geoConicEqualArea().parallels([34, 40.5]).rotate([120, 0]).fitSize([960, 960], d)' < ca.json > ca-albers.json
 geoproject 'd3.geoConicEqualArea().parallels([34, 40.5]).rotate([120, 0]).fitSize([960, 960], d)' < ca2018bg-density.ndjson > ca2018bg-density-albers.json
 
-*didn't work.  so taking geojson from 2g and upload to mapbox as tilesets import and see.  name is ca2018bg-density-dbc449 -> sn50.4jkgze8k*  yeap, worked in mapbox.  probably want to avoid dealing with d3...
+*didn't work.  so taking geojson from 2g and upload to mapbox as tilesets import and see.  name is ca2018bg-density-dbc449 -> sn50.4jkgze8k*  yeap, worked in mapbox.  so can  avoid dealing with d3...  
+However, the TopoJSON simplification were not done, so file size were not optimal.
+Currently have the JS load the whole geojson file, so it is noticeable when map load.
+Could upload to mapbox tile server and convert to tile, then Topo simplification may not matter much.
+
+
+**TODO** 
+Medium post.
+omit step 1c.
+completed till step 2g.
+Then the geojson can up parsed by mapbox and provide a link.
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**rest of these steps were performed per README.censusBlock.rst (in Calif Albers) 
+but skipped for this Lng/Lat version**
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 

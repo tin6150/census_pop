@@ -5,7 +5,7 @@ Population density from Census data
 - Population density by Census Block Group 
 - Population density by Census Tract
 
-URL: https://tin6150.github.io/census_pop/ 
+URL: https://tin6150.github.io/census_pop/census_map_medium.html#8/37.7535/-122.44
 
 
 Write Up

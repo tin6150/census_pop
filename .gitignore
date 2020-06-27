@@ -3,6 +3,8 @@ TMP_DATA
 TMP_DATA_Tract
 TMP_DATA_BLOCK
 TMP_DATA_LngLat
+TMP_DATA_2010_BG
+TMP_DATA_2010_TRACT
 # next two not adding to github cuz caAlbers projection load horribly, and code essentially in the census_pop_density_blk_grp.html
 census_pop_density_blk_grp_CaAlbers.html
 data/ca2018bg-albers-density.geojson

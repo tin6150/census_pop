@@ -21,6 +21,7 @@ Previous README for various census data:
 * README.censusTract.rst - 1st round, replicating Bostock commands, pop density by Census Tract
 * README.censusBlock.rst - 2nd round, pop density by Census Block Group (in CA Albers projection)
 * README.lngLat.rst      - 3rd round, variant of 2, without Albers projection, just use plain Longitude,Latitude coordinate
+* README.lngLat2010BG.rst - 4th round, variant of 3, use Census 2010 data.  have pop density, pop count and ALAND in final geojson
 * README.devNote.rst     - commands to aid in development.
 
 

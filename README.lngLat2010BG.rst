@@ -60,7 +60,10 @@ ndjson-split 'd.features' < ca2010bg.json  > ca2010bg.ndjson
 "geometry":{"type":"Polygon","coordinates":[[[-123.013915661213,37.7003546200356],[-123.013897208114,37.7044781079737],[-123.01219398246,37.7067490723693],[-123.004488914922,37.7062624378153],[-123.000190295549,37.7029370922656],[-122.997189374607,37.6979085210616],[-123.00067693324601,37.6902034527376],[-123.00554329136101,37.6893923927899],[-123.01146402905701,37.6919066776061],[-123.014302738481,37.696205295407296],[-123.013915661213,37.7003546200356]]]}}
 
 
-Census 2010 don't have GEOID.  it has GEO_ID, which correspond to AFFGEOID.  It is like GEOID but with extra text prefixed to it.  eg: 060759804011 vs 1500000US060759804011
+Census 2010 don't have GEOID.  it has GEO_ID, which correspond to AFFGEOID.  It is like GEOID but with extra text prefixed to it.  
+eg: 060759804011 vs 1500000US060759804011
+    01              0123456789|
+"06" was likely FIPS of CA
 
 No ALAND, AWATER, has a thing called CNESUSAREA, which maybe land area, but likely in diff unit.
 (2014/2018 ACS (estimate) data ALAND was in m^2, this 2010 survey data CENSUSAREA is in ???  *FIXME*  )
@@ -68,17 +71,19 @@ No ALAND, AWATER, has a thing called CNESUSAREA, which maybe land area, but like
 
 # **2b** add id field
 
-ndjson-map 'd.id = d.properties.GEOID.slice(2), d'  < ca2010bg.ndjson  > ca2010bg-id.ndjson
+#was# ndjson-map 'd.id = d.properties.GEOID.slice(2), d'  < ca2018bg.ndjson  > ca2018bg-id.ndjson
+slice(2) means start at index=2 ?  so now use index=11
+ndjson-map 'd.id = d.properties.GEO_ID.slice(11), d'  < ca2010bg.ndjson  > ca2010bg-id.ndjson
 
-**>>**   *need to do substring... shipping for now*
 
-eg extra id field at the end:
+#2018 estimate data eg -- with extra id field at the end:
 {"type":"Feature","properties":{"STATEFP":"06","COUNTYFP":"075","TRACTCE":"980401","BLKGRPCE":"1","AFFGEOID":"1500000US060759804011","GEOID":"060759804011","NAME":"1","LSAD":"BG","ALAND":419323,"AWATER":247501289},"geometry":{"type":"Polygon","coordinates":[[[-123.013916,37.700355],[-123.007786,37.698943],[-123.007548,37.70214],[-123.003507,37.704395999999996],[-123.00089299999999,37.701011],[-122.99875399999999,37.697438],[-123.002794,37.692736],[-123.005884,37.693489],[-123.007548,37.695934],[-123.012777,37.696498],[-123.013916,37.700355]]]},"id":"0759804011"}
 
+#2010 survey data:
+{"type":"Feature","properties":{"GEO_ID":"1500000US060759804011","STATE":"06","COUNTY":"075","TRACT":"980401","BLKGRP":"1","NAME":"1","LSAD":"BG","CENSUSAREA":0.162},"geometry":{"type":"Polygon","coordinates":[[[-123.013915661213,37.7003546200356],[-123.013897208114,37.7044781079737],[-123.01219398246,37.7067490723693],[-123.004488914922,37.7062624378153],[-123.000190295549,37.7029370922656],[-122.997189374607,37.6979085210616],[-123.00067693324601,37.6902034527376],[-123.00554329136101,37.6893923927899],[-123.01146402905701,37.6919066776061],[-123.014302738481,37.696205295407296],[-123.013915661213,37.7003546200356]]]},"id":"0759804011"}
+
+
 # **2c** get data via census api
-
-
-# census api to get pop 
 
 # census api to get pop 
 source ~/.ssh/.env
@@ -119,6 +124,19 @@ done
 
 
 # **2d** 
+
+#   field f1 is "id" field, combination of 3 columns: 2 and 3, 4, merged, no space.  0-idx, add +1 as offset cuz NAME field from new census api
+#   field f2 is "B01003" (pop estimate, name from census var name): use column 0  [add +1 offset] [same as prev tract data]
+#   dont have State FIPS in it cuz always CA (06)
+
+
+# **fiexed2d**
+ndjson-cat cb_2018_06_bg_B01003.001.json \
+  | ndjson-split 'd.slice(1)' \
+  | ndjson-map '{id: d[3] + d[4] +d[5], B01003: +d[1]}'  >        cb_2018_06_bg_B01003.001.ndjson
+#                    ^^^^f1^^^^^                ^^f2^^
+
+#   ndjson has key: value pair, field 1 key is "id: ', field 2 key is "B01003: '
 # result is this, which looks like what bostock expect.  could be piped to a csv
 {"id":"0014441003","B01003":1755}
 {"id":"0014441002","B01003":1320}
@@ -126,10 +144,22 @@ done
 
 
 round 4 census 2010 eg result, and quite diff than previous example at step 2d:
+
+# fix marking>>> *>>* refer to 2d in ../README.censusBlock.rst
+new census block group 1 file per county - cb_2018_06_bg_B01003.001.json:
+#  offset, ----#0-----, #1----,#2------,#3,----,#4-----------
+
+
 [["P001001","NAME","state","county","tract","block group"],
 ["1703","Block Group 3, Census Tract 4441, Alameda County, California","06","001","444100","3"],
 ["1531","Block Group 2, Census Tract 4441, Alameda County, California","06","001","444100","2"],
  ["902","Block Group 1, Census Tract 4445, Alameda County, California","06","001","444500","1"],
+
+# fix marking>>> *>>*
+ ^^^^^^single^^field^^^add^+1^as^offset^^^^^^^^^^^^^^^^^^^^^^^^ ^#0^   ^#1  ^#2^   ^^#3^^  +++--one more tailing column for BG
+ NAME                                                          ,pop, state,county,tract---,BG
+ #0 new numbering after +1 offset for NAME column              , #1,    #2,  #3  ,   #4   ,#5
+
 
 
 **>>**

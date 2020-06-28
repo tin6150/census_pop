@@ -228,8 +228,16 @@ So guest that CENSUSAREA is in sq mile should also be accurate.
 
 Further check by looking at mapbox result.
 
-
 ~~~~
+
+Check:
+why no data near East Palo Alto? BG id 
+19900000
+819901000
+marsh area, thus no population?
+
+
+~~~~~~~~
 
 
 .. # use 8-space tab as that's how github render the rst

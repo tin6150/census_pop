@@ -23,12 +23,8 @@ mkdir TMP_DATA_2010_BG
 cd    TMP_DATA_2010_BG
 
 
-XX curl 'https://www2.census.gov/geo/tiger/GENZ2018/shp/cb_2018_06_bg_500k.zip' -o cb_2018_06_bg_500k.zip ;  unzip ...
-
-
 2010 survey has diff filename convention than the 2018 estimate data.
 see https://www2.census.gov/geo/tiger/GENZ2010/ReadMe.pdf
-
 	The 2010 cartographic boundary files are named gz_2010_ss_lll_vv_rr.zip where:
 	ss = state fips code or 'us' for a national level file # 06 = CA
 	lll = summary level code   	# 150 is Block Group level data.  
@@ -40,26 +36,11 @@ see https://www2.census.gov/geo/tiger/GENZ2010/ReadMe.pdf
 	o 5m = 1:5,000,000
 	o 20m = 1:20,000,000 
 
-So
+curl  https://www2.census.gov/geo/tiger/GENZ2010/gz_2010_06_150_00_500k.zip -o cb_2010_06_bg_500k.zip 
+unzip ...
 
-shp2json cb_2018_06_bg_500k.shp -o ca2018bg.json
+shp2json gz_2010_06_150_00_500k.shp -o ca2010bg.json
 # above json is in lng/lat, truely geojson it seems)
-
-ln ../TMP_DATA_BLOCK/ca2018bg.json .
-
-
-# **eg 1b**
-XX omiting ca albers projection
-XX geoproject 'd3.geoConicEqualArea().parallels([34, 40.5]).rotate([120, 0]).fitSize([960, 960], d)' < ca2018bg.json > ca2018bg-albers.json
-# map project, changed coordinates to like [164.1468809671912,437.62295438355295]
-# anyway, lost lng/lat by here, not good for modeling work downstream.
-
-# **eg 1c**
-
-XX geo2svg -w 960 -h 960 < ca2018bg-albers.json > ca2018bg-albers.svg
-# that svg file is huge, 11M, xviewer could not handle it.  (but prev handled 6.7M file)
-
-
 
 part 2 - join shape with pop data by id
 ======
@@ -67,30 +48,75 @@ part 2 - join shape with pop data by id
 https://medium.com/@mbostock/command-line-cartography-part-2-c3a82c5c0f3
 
 # xref: inet-dev-class/mapbox/eg_data_ndjson/README.txt.rst , which likely also in covid19_care_capacity_map/
-# **eg 2a**  geojson to ndjson
-XX ndjson-split 'd.features' < ca2018bg-albers.json  > ca2018bg-albers.ndjson
-ndjson-split 'd.features' < ca2018bg.json  > ca2018bg.ndjson
+# **step 2a**  geojson to ndjson
+ndjson-split 'd.features' < ca2010bg.json  > ca2010bg.ndjson
 
-# prev albers -  census block group (2018) TRACTCE: 980401
-{"type":"Feature","properties":{"STATEFP":"06","COUNTYFP":"075","TRACTCE":"980401","BLKGRPCE":"1","AFFGEOID":"1500000US060759804011","GEOID":"060759804011","NAME":"1","LSAD":"BG","ALAND":419323,"AWATER":247501289},"geometry":{"type":"Polygon","coordinates":[[[164.1468809671912,437.62295438355295],[164.63136562909594,437.78130627883274],[164.66061334779198,437.4585472897443],[164.99020559033386,437.24058568718465],[165.18788475165627,437.5895682364189],[165.34708696199812,437.95636228142894],[165.00971718370104,438.4217441413507],[164.76560417638595,438.337767038262],[164.64069467117463,438.0862550961165],[164.22534302939806,438.0159600586103],[164.1468809671912,437.62295438355295]]]}}
+# prev census 2018 estimate data in  lng/lat : 
+{"type":"Feature","properties":{"STATEFP":"06","COUNTYFP":"075","TRACTCE":"980401","BLKGRPCE":"1","AFFGEOID":"1500000US060759804011","GEOID":"060759804011","NAME":"1","LSAD":"BG","ALAND":419323,"AWATER":247501289},
+"geometry":{"type":"Polygon","coordinates":[[[-123.013916,37.700355],[-123.007786,37.698943],[-123.007548,37.70214],[-123.003507,37.704395999999996],[-123.00089299999999,37.701011],[-122.99875399999999,37.697438],[-123.002794,37.692736],[-123.005884,37.693489],[-123.007548,37.695934],[-123.012777,37.696498],[-123.013916,37.700355]]]}}
 
-# new lng/lat : 
-{"type":"Feature","properties":{"STATEFP":"06","COUNTYFP":"075","TRACTCE":"980401","BLKGRPCE":"1","AFFGEOID":"1500000US060759804011","GEOID":"060759804011","NAME":"1","LSAD":"BG","ALAND":419323,"AWATER":247501289},"geometry":{"type":"Polygon","coordinates":[[[-123.013916,37.700355],[-123.007786,37.698943],[-123.007548,37.70214],[-123.003507,37.704395999999996],[-123.00089299999999,37.701011],[-122.99875399999999,37.697438],[-123.002794,37.692736],[-123.005884,37.693489],[-123.007548,37.695934],[-123.012777,37.696498],[-123.013916,37.700355]]]}}
+# round 4, using census 2010 data, example record:
+{"type":"Feature","properties":{"GEO_ID":"1500000US060759804011","STATE":"06","COUNTY":"075","TRACT":"980401","BLKGRP":"1","NAME":"1","LSAD":"BG","CENSUSAREA":0.162},
+"geometry":{"type":"Polygon","coordinates":[[[-123.013915661213,37.7003546200356],[-123.013897208114,37.7044781079737],[-123.01219398246,37.7067490723693],[-123.004488914922,37.7062624378153],[-123.000190295549,37.7029370922656],[-122.997189374607,37.6979085210616],[-123.00067693324601,37.6902034527376],[-123.00554329136101,37.6893923927899],[-123.01146402905701,37.6919066776061],[-123.014302738481,37.696205295407296],[-123.013915661213,37.7003546200356]]]}}
+
+
+Census 2010 don't have GEOID.  it has GEO_ID, which correspond to AFFGEOID.  It is like GEOID but with extra text prefixed to it.  eg: 060759804011 vs 1500000US060759804011
+
+No ALAND, AWATER, has a thing called CNESUSAREA, which maybe land area, but likely in diff unit.
+(2014/2018 ACS (estimate) data ALAND was in m^2, this 2010 survey data CENSUSAREA is in ???  *FIXME*  )
+
 
 # **2b** add id field
 
-ndjson-map 'd.id = d.properties.GEOID.slice(2), d'  < ca2018bg.ndjson  > ca2018bg-id.ndjson
+ndjson-map 'd.id = d.properties.GEOID.slice(2), d'  < ca2010bg.ndjson  > ca2010bg-id.ndjson
+
+**>>**   *need to do substring... shipping for now*
 
 eg extra id field at the end:
 {"type":"Feature","properties":{"STATEFP":"06","COUNTYFP":"075","TRACTCE":"980401","BLKGRPCE":"1","AFFGEOID":"1500000US060759804011","GEOID":"060759804011","NAME":"1","LSAD":"BG","ALAND":419323,"AWATER":247501289},"geometry":{"type":"Polygon","coordinates":[[[-123.013916,37.700355],[-123.007786,37.698943],[-123.007548,37.70214],[-123.003507,37.704395999999996],[-123.00089299999999,37.701011],[-122.99875399999999,37.697438],[-123.002794,37.692736],[-123.005884,37.693489],[-123.007548,37.695934],[-123.012777,37.696498],[-123.013916,37.700355]]]},"id":"0759804011"}
 
 # **2c** get data via census api
 
+
 # census api to get pop 
-# 58 ndjson files, combine into single one.  (23212 lines, match prev wc sum for all counties)
-#~ cat cb_2018_06_bg_B01003.???.ndjson > cb_2018_06_bg_B01003.CA.ndjson
-# (skipped 2b to 2d, just reuse prev Block Grp data)
-ln ../TMP_DATA_BLOCK/cb_2018_06_bg_B01003.CA.ndjson  .
+
+# census api to get pop 
+source ~/.ssh/.env
+echo $ApiKey
+
+for ACS 5 year estimate API, refer to README.censusBlock.rst
+For list of Census data API, see https://www.census.gov/data/developers/data-sets.html
+Decenial census 2010 data API: https://www.census.gov/data/developers/data-sets/decennial-census.html
+
+URL/VAR:: The B01003_001E in the URL specifies the total population estimate,
+https://api.census.gov/data/2010/dec/sf1/variables.html ::
+	P001001 is Total Population, but there are diff var for urban, rural and some stange combinations.
+	H010001 : TOTAL POPULATION IN OCCUPIED HOUSING UNITS
+
+eg: https://api.census.gov/data/2010/dec/sf1?get=H001001,NAME&for=state:*&key=[user key]
+
+Example call for white population of 12 year olds in Alabama: 
+api.census.gov/data/2010/dec/sf1?get=PCT012A015,PCT012A119&for=state:01&key=[user key]
+	PCT012A015	Total!!Male!!12 years	SEX BY AGE (WHITE ALONE)
+	PCT012A119	Total!!Female!!12 years	SEX BY AGE (WHITE ALONE)
+
+curl "https://api.census.gov/data/2010/dec/sf1?get=P001001,NAME&for=state:06&key=$ApiKey" -o caliPop2010.json
+
+ref for more examples: https://api.census.gov/data/2010/dec/sf1/examples.html
+
+
+150 = block group, 23212 rows
+curl "https://api.census.gov/data/2010/dec/sf1?get=P001001,NAME&for=block%20group:*&in=state:06&in=county:*&in=tract:*&key=$ApiKey" -o CaAllBG.json
+
+140 = tract, 8057 rows
+curl "https://api.census.gov/data/2010/dec/sf1?get=P001001,NAME&for=tract:*&in=state:06&in=county:*&key=$ApiKey" -o CaAllTract.json
+
+
+CaAllBG.json has 23212 rows, which match round 3 ACS 2018 estimate data downloaded as: 
+for FIPS in $(seq -w 001 2 115); do
+        echo curl "https://api.census.gov/data/2018/acs/acs5?get=NAME,B01003_001E&for=block%20group:*&in=state:06%20county:$FIPS&key=$ApiKey" -o cb_2018_06_bg_B01003.$FIPS.json
+done
+
 
 # **2d** 
 # result is this, which looks like what bostock expect.  could be piped to a csv
@@ -98,6 +124,16 @@ ln ../TMP_DATA_BLOCK/cb_2018_06_bg_B01003.CA.ndjson  .
 {"id":"0014441002","B01003":1320}
 {"id":"0014445001","B01003":1199}
 
+
+round 4 census 2010 eg result, and quite diff than previous example at step 2d:
+[["P001001","NAME","state","county","tract","block group"],
+["1703","Block Group 3, Census Tract 4441, Alameda County, California","06","001","444100","3"],
+["1531","Block Group 2, Census Tract 4441, Alameda County, California","06","001","444100","2"],
+ ["902","Block Group 1, Census Tract 4445, Alameda County, California","06","001","444500","1"],
+
+
+**>>**
+join need more work as input changed drastically, and the key merging several fields...
 
 
 # **eg 2e**  magic! join

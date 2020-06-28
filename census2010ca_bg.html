@@ -151,7 +151,7 @@ p {
 <!-- this create the top right TR info box -->
 <div class='map-overlay' id='features'>
 	<h2>Decenial Census 2010 data:</h2> <!-- this is title of top right box -->
-	<div id='pd'><p>Hoover to show data.</p></div>   <!-- static text, replaced later by JS -->
+	<div id='pd'><p>Hover to show data.</p></div>   <!-- static text, replaced later by JS -->
 </div>
 
 
@@ -234,8 +234,8 @@ function cb4mouseMove_featuresDataBoxInfo(e) {
         if (states.length > 0) {
             text2display = 
                "Density (person/sq mile): " + Math.round(states[0].properties.density)    + "<BR>" 
-             + "Pop Count:                " + Math.round(states[0].properties.popCount)   + "<BR>" 
-             + "Area (sq mile):           " + Math.round(states[0].properties.CENSUSAREA) + "<BR>" 
+             + "Pop Count:                " +            states[0].properties.popCount    + "<BR>" 
+             + "Area (sq mile):           " +            states[0].properties.CENSUSAREA  + "<BR>" 
              + "Block Group id:           " + states[0].id + "<BR>" 
             //console.log( "--dbg-- L240: inside cb4mouseMove_featuresDataBoxInfo(...), text2display is", text2display );
             console.log( "BG id, density", states[0].id, states[0].properties.density );

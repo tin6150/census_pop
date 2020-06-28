@@ -134,7 +134,7 @@ prev census tract
 ["Census Tract 4382.04, Alameda County, California","5338","06","001","438204"],
   ^^extra 1^^           ^^extra 2^^^^^  ^^extra 3^^  ^#0^  ^#1  ^#2^   ^^#3^^
  ^^^^^^single^^field^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#1, ... #3 are the orig field bostock eg refers to.  so i am no off by +1 
+#1, ... #3 are the orig field bostock eg refers to.  so i am now off by +1 
 
 new census block group 1 file per county - cb_2018_06_bg_B01003.001.json:
 #  offset, ----#0-----, #1----,#2------,#3,----,#4-----------

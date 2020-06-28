@@ -86,7 +86,7 @@ cat cb_2014_06_tract_B01003.json | json2csv > cb_2014_06_tract_B01003.json.csv
 ["Census Tract 4382.04, Alameda County, California","5338","06","001","438204"],
   ^^extra 1^^           ^^extra 2^^^^^  ^^extra 3^^  ^#0^  ^#1  ^#2^   ^^#3^^
  ^^^^^^single^^field^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#1, ... #3 are the orig field bostock eg refers to.  so i am no off by +1 
+#1, ... #3 are the orig field bostock eg refers to.  so i am now off by +1 
 
 # **eg 2d** 
 

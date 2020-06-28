@@ -9,6 +9,8 @@ https://tin6150.github.io/census_pop/census_map_medium.html#8/37.7535/-122.44
 
 - Population density by Census Block Group (2010 decenial survey):
 https://tin6150.github.io/census_pop/census2010ca_bg.html#10/36.7681/-119.8362
+- Population density by Census Tract (2010 decenial survey):
+https://tin6150.github.io/census_pop/census2010ca_tr.html#10/36.7681/-119.8362
 
 
 

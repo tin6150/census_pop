@@ -239,9 +239,9 @@ function cb4mouseMove_featuresDataBoxInfo(e) {
                "Density (person/sq mile): " + Math.round(states[0].properties.density)    + "<BR>" 
              + "Pop Count:                " +            states[0].properties.popCount    + "<BR>" 
              + "Area (sq mile):           " +            states[0].properties.CENSUSAREA  + "<BR>" 
-             + "Block Group id:           " + states[0].id + "<BR>" 
+             + "Census Tract id:          " +            states[0].id                     + "<BR>" 
             //console.log( "--dbg-- L240: inside cb4mouseMove_featuresDataBoxInfo(...), text2display is", text2display );
-            console.log( "BG id, density", states[0].id, states[0].properties.density );
+            console.log( "Tract id, density", states[0].id, states[0].properties.density );
 
             dbgText2display  = JSON.stringify(states);     //tmp dbg use
             dbg2Text2display = JSON.stringify(states[0]);  //tmp dbg use
@@ -294,7 +294,7 @@ function cb4event_dataClassSelectorUI(evt) {
 		})
 		console.log("--dbg--L427: cb4event_dataClassSelectorUI(evt) -- addLayer status:", addStatus );
 		document.getElementById('LegendTitle').innerHTML="Pop per sq mile";
-		document.getElementById('LegendText').innerHTML="<div class='label'>0</div> <div class='label'>200</div> <div class='label'>1000</div> <div class='label'>4000+</div>";
+		document.getElementById('LegendText').innerHTML="<div class='label'>0</div> <div class='label'>100</div> <div class='label'>4000</div> <div class='label'>15000+</div>";
 	} else {
     // population data would only hit this block, never the if-then above
 		addStatus = map.addLayer({

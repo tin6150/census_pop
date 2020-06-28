@@ -78,9 +78,9 @@ p {
 /* this specify the size of the top right info box TR */
 #features {
     top: 0;
-    height: 90px;      /* formerly 190px */
+    height: 130px;      /* formerly 190px */
     margin-top: 2px;
-    width: 180px;      /* formerly 250px */
+    width: 200px;      /* formerly 250px */
 }
 
 
@@ -150,7 +150,7 @@ p {
 
 <!-- this create the top right TR info box -->
 <div class='map-overlay' id='features'>
-	<h2>Pop per sq mile:</h2> <!-- this is title of top right box -->
+	<h2>Decenial Census 2010 data:</h2> <!-- this is title of top right box -->
 	<div id='pd'><p>Hoover to show data.</p></div>   <!-- static text, replaced later by JS -->
 </div>
 
@@ -236,9 +236,9 @@ function cb4mouseMove_featuresDataBoxInfo(e) {
                "Density (person/sq mile): " + Math.round(states[0].properties.density)    + "<BR>" 
              + "Pop Count:                " + Math.round(states[0].properties.popCount)   + "<BR>" 
              + "Area (sq mile):           " + Math.round(states[0].properties.CENSUSAREA) + "<BR>" 
-             + "Block Group id:   " + states[0].id + "<BR>" 
-            // + "id (Block Group): " + states[0].properties.id + "<BR>" 
-            //console.log( "--dbg-- L324: inside cb4mouseMove_featuresDataBoxInfo(...), text2display is", text2display );
+             + "Block Group id:           " + states[0].id + "<BR>" 
+            //console.log( "--dbg-- L240: inside cb4mouseMove_featuresDataBoxInfo(...), text2display is", text2display );
+            console.log( "BG id, density", states[0].id, states[0].properties.density );
 
             dbgText2display  = JSON.stringify(states);     //tmp dbg use
             dbg2Text2display = JSON.stringify(states[0]);  //tmp dbg use
@@ -246,7 +246,7 @@ function cb4mouseMove_featuresDataBoxInfo(e) {
             text2display += '<p>Hover over covered area of map.</p>';
         };
         document.getElementById('pd').innerHTML = text2display;           // pd is inside TR overlay box
-        document.getElementById('dbgBox2').innerHTML = dbg2Text2display;  // dbgBox2 is BL overlay box dbg2
+        //document.getElementById('dbgBox2').innerHTML = dbg2Text2display;  // dbgBox2 is BL overlay box dbg2
         //document.getElementById('dbgBox2').innerHTML = dbgText2display;   // dbgBox  is BR overlay box dbg    // why cant use dbgBox ? complain is null...
 };  //end cb4mouseMove_featuresDataBoxInfo()
 

@@ -21,16 +21,17 @@ Previous README for various census data:
 * README.censusTract.rst - 1st round, replicating Bostock commands, pop density by Census Tract
 * README.censusBlock.rst - 2nd round, pop density by Census Block Group (in CA Albers projection)
 * README.lngLat.rst      - 3rd round, variant of 2, without Albers projection, just use plain Longitude,Latitude coordinate
-* README.lngLat2010BG.rst - 4th round, variant of 3, use Census 2010 data.  have pop density, pop count and ALAND in final geojson
+* README.lngLat2010BG.rst - 4th round, variant of 3, use Census 2010 data.  have pop density, pop count and CENSUSAREA in final geojson
+* README.lngLat2010Tract.rst - 5th round, variant of 3, use Census 2010 data.  have pop density, pop count and CENSUSAREA in final geojson
 * README.devNote.rst     - commands to aid in development.
 
 
 DATA SOURCES
 ============
 
-- Census Estimate for 2018
-- Mapbox
-
+- Census Estimate for 2018 (ACS survey, [5 year result?])
+- Decenial Census survey 2010 (ACS survey, [5 year result?])
+  Note that in 2014 API/fields changed compared to 2010, so round 3 vs 4+5 has slightly diff commands.
 
 
 ABOUT

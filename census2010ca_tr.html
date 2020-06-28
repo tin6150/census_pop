@@ -8,6 +8,7 @@
   (also slightly cleaned)
 
   census2010ca_bg.html            - based on census_map_medium.html, use census 2010 block group data
+  census2010ca_tr.html            - same as census2010ca_bg.html, just using census 2010 tract data
 
 	ref: 
 	https://gist.github.com/danswick/d813345baf286a5e0766c6b3d9de01c0
@@ -17,7 +18,7 @@
 
 <head>
   <meta charset='utf-8' />
-  <title>Calif Population Density by Census Block Group (2010 Decenial survey)</title>
+  <title>Calif Population Density by Census Tract (2010 Decenial survey)</title>
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
   <script src='https://api.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js'></script>
@@ -370,7 +371,7 @@ function cb4map_on_load__covidtracking() {
 	// https://stackoverflow.com/questions/51166886/how-to-fill-color-for-a-region-based-on-value-in-mapbox
 	// caair.html
 	//--map.addSource('covid19-cap+case', {  // see ZWEDC_50x50sq_js.html line 461
-	map.addSource('popByCensusBlkGrpLngLatSrc', { 'type': 'geojson', 'data': './data/ca2010bg-density.geojson' });
+	map.addSource('popByCensusBlkGrpLngLatSrc', { 'type': 'geojson', 'data': './data/ca2010tr-density.geojson' });
   currentDataSrc = "popByCensusBlkGrpLngLatSrc";
 	//-map.addSource('popByCensusBlkGrpCaAlbersSrc', { 'type': 'geojson', 'data': './data/ca2018bg-albers-density.geojson' }); // render really strangely , dont use a projection with mapbox!
   //currentDataSrc = "popByCensusBlkGrpCaAlbersSrc";
